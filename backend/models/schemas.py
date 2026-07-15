@@ -67,3 +67,37 @@ class QnaAgentResponse(BaseModel):
     pattern_flags: List[QnaPatternFlag] = Field(default_factory=list)
     agent_reasoning_trace: List[AgentTraceStep] = Field(default_factory=list)
     fallback_used: bool
+
+class HealthBriefStats(BaseModel):
+    return_rate: float
+    return_rate_trend: str
+    cod_returns: int
+    prepaid_returns: int
+    top_complaint_theme: str
+    total_orders: int
+
+class HealthBriefRecommendation(BaseModel):
+    text: str
+    money_saved_estimate: float
+    action: str
+    action_value: float
+
+class HealthBriefResponse(BaseModel):
+    seller_name: str
+    week_range: str
+    stats: HealthBriefStats
+    recommendation: HealthBriefRecommendation
+    narrative_summary: str
+    narrative_source: str
+    note: str = Field(
+        default="This is a simulated weekly brief based on representative demo data. In production, this would be generated from the seller's actual order and return history."
+    )
+
+class ApplySuggestionRequest(BaseModel):
+    seller_id: str
+    action: str
+
+class ApplySuggestionResponse(BaseModel):
+    success: bool
+    message: str
+

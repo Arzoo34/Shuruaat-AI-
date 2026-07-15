@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from routes.listing import router as listing_router
 from routes.evaluation import router as evaluation_router
 from routes.qna import router as qna_router
+from routes.health_brief import router as health_brief_router
 
 # Load environment variables from .env file
 load_dotenv()
@@ -19,6 +20,7 @@ app = FastAPI(
 app.include_router(listing_router)
 app.include_router(evaluation_router)
 app.include_router(qna_router)
+app.include_router(health_brief_router)
 
 # Parse CORS Origins from env
 cors_origins_str = os.getenv("CORS_ORIGINS", '["*"]')
