@@ -7,6 +7,13 @@ class ListingContent(BaseModel):
     size_chart: Dict[str, str] = Field(..., description="Sizing chart dictionary mapping size to details")
     price: int = Field(..., description="Recommended price in INR")
     keywords: List[str] = Field(..., description="Search keywords")
+    material: Optional[str] = Field(None, description="Primary material of the product")
+    fabric: Optional[str] = Field(None, description="Fabric details if applicable")
+    colour: Optional[str] = Field(None, description="Main color(s) of the product")
+    pattern: Optional[str] = Field(None, description="Pattern style or print type")
+    sleeve: Optional[str] = Field(None, description="Sleeve type (null for non-apparel)")
+    occasion: Optional[str] = Field(None, description="Occasion suitability")
+    available_sizes: Optional[List[str]] = Field(None, description="List of standard sizes available")
 
 class AgentTraceStep(BaseModel):
     tool_called: str = Field(..., description="Name of the tool that was called")

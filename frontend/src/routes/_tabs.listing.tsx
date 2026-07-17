@@ -7,6 +7,8 @@ import { useTranslation } from "@/lib/language-context";
 import { runListingAgent } from "@/api/client";
 import { useAppStore } from "@/store/appStore";
 import { FullScreenLoader, ErrorState } from "@/components/SkeletonLoader";
+import { cn } from "@/lib/utils";
+import { KantriMotifDivider } from "./listing.preview";
 
 export const Route = createFileRoute("/_tabs/listing")({
   head: () => ({ meta: [{ title: "Listing Agent — शुरुआत AI" }] }),
@@ -33,6 +35,74 @@ function ListingPage() {
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [isRecording, setIsRecording] = useState(false);
+
+  const [productName, setProductName] = useState("");
+  const [material, setMaterial] = useState("");
+  const [colour, setColour] = useState("");
+  const [sleeve, setSleeve] = useState("");
+  const [occasion, setOccasion] = useState("");
+  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
+  const [description, setDescription] = useState("");
+  const [detailsExpanded, setDetailsExpanded] = useState(true);
+  const [isRecordingDescription, setIsRecordingDescription] = useState(false);
+  const recognitionRef = useRef<any>(null);
+
+  const isApparel = declaredCategory === "kurti" || declaredCategory === "saree";
+
+  function toggleSizeSelection(sz: string) {
+    if (selectedSizes.includes(sz)) {
+      setSelectedSizes(selectedSizes.filter((s) => s !== sz));
+    } else {
+      setSelectedSizes([...selectedSizes, sz]);
+    }
+  }
+
+  function toggleDescriptionRecording() {
+    if (isRecordingDescription) {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+      setIsRecordingDescription(false);
+      return;
+    }
+
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Speech recognition is not supported in this browser. Please type manually.");
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.lang = language === "hi" ? "hi-IN" : "en-IN";
+      recognition.interimResults = false;
+
+      recognition.onstart = () => {
+        setIsRecordingDescription(true);
+      };
+
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setDescription((prev) => (prev ? prev + " " + transcript : transcript));
+      };
+
+      recognition.onerror = (event: any) => {
+        console.error(event);
+        setIsRecordingDescription(false);
+      };
+
+      recognition.onend = () => {
+        setIsRecordingDescription(false);
+      };
+
+      recognition.start();
+      recognitionRef.current = recognition;
+    } catch (e) {
+      console.error(e);
+      setIsRecordingDescription(false);
+    }
+  }
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -122,6 +192,14 @@ function ListingPage() {
       imageFiles.forEach((file) => {
         formData.append("images", file);
       });
+
+      if (productName.trim()) formData.append("product_name", productName.trim());
+      if (material.trim()) formData.append("material", material.trim());
+      if (colour.trim()) formData.append("colour", colour.trim());
+      if (sleeve.trim() && isApparel) formData.append("sleeve", sleeve.trim());
+      if (occasion.trim()) formData.append("occasion", occasion.trim());
+      if (selectedSizes.length > 0) formData.append("sizes", selectedSizes.join(","));
+      if (description.trim()) formData.append("description", description.trim());
 
       const response = await runListingAgent(formData);
 
@@ -294,6 +372,167 @@ function ListingPage() {
           value={pincode}
           onChange={(v) => setPincode(v.replace(/\D/g, "").slice(0, 6))}
         />
+
+        {/* Product Attributes Header */}
+        <div className="flex items-center justify-between pt-4 border-t border-border/40">
+          <h3 className="text-sm font-semibold text-foreground">Product Attributes</h3>
+          <button
+            type="button"
+            onClick={() => setDetailsExpanded(!detailsExpanded)}
+            className="text-xs font-semibold text-primary hover:underline flex items-center gap-0.5"
+          >
+            {detailsExpanded ? "Hide details" : "Show details"}
+          </button>
+        </div>
+
+        {/* Collapsible Attributes Container */}
+        <AnimatePresence initial={false}>
+          {detailsExpanded && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="overflow-hidden space-y-4 pt-2"
+            >
+              {/* Product Name (Full Width) */}
+              <div>
+                <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                  Product Name / Title (optional)
+                </label>
+                <input
+                  type="text"
+                  value={productName}
+                  onChange={(e) => setProductName(e.target.value)}
+                  placeholder="e.g. Pink Banarasi Silk Saree"
+                  className="w-full rounded-xl border border-border bg-card px-4 py-2.5 text-sm focus:border-primary focus:outline-none"
+                />
+              </div>
+
+              {/* Material & Colour Grid */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                    Material / Fabric
+                  </label>
+                  <input
+                    type="text"
+                    value={material}
+                    onChange={(e) => setMaterial(e.target.value)}
+                    placeholder="e.g. Pure Cotton"
+                    className="w-full rounded-xl border border-border bg-card px-4 py-2.5 text-sm focus:border-primary focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                    Colour / Pattern
+                  </label>
+                  <input
+                    type="text"
+                    value={colour}
+                    onChange={(e) => setColour(e.target.value)}
+                    placeholder="e.g. Indigo Blue"
+                    className="w-full rounded-xl border border-border bg-card px-4 py-2.5 text-sm focus:border-primary focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Occasion & Sleeve (Apparel Only) Grid */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                    Occasion
+                  </label>
+                  <input
+                    type="text"
+                    value={occasion}
+                    onChange={(e) => setOccasion(e.target.value)}
+                    placeholder="e.g. Festive Wear"
+                    className="w-full rounded-xl border border-border bg-card px-4 py-2.5 text-sm focus:border-primary focus:outline-none"
+                  />
+                </div>
+                {isApparel && (
+                  <div>
+                    <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                      Sleeve
+                    </label>
+                    <input
+                      type="text"
+                      value={sleeve}
+                      onChange={(e) => setSleeve(e.target.value)}
+                      placeholder="e.g. 3/4 Sleeve"
+                      className="w-full rounded-xl border border-border bg-card px-4 py-2.5 text-sm focus:border-primary focus:outline-none"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Sizes Multi-Select */}
+              <div>
+                <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                  Sizes Available
+                </label>
+                <div className="flex flex-wrap gap-2 mt-1">
+                  {["Free", "S", "M", "L", "XL", "XXL"].map((sz) => {
+                    const isSelected = selectedSizes.includes(sz);
+                    return (
+                      <button
+                        key={sz}
+                        type="button"
+                        onClick={() => toggleSizeSelection(sz)}
+                        className={cn(
+                          "rounded-xl border px-3 py-1.5 text-xs font-semibold btn-lift transition-all",
+                          isSelected
+                            ? "border-primary bg-primary/10 text-primary shadow-sm"
+                            : "border-border bg-card text-muted-foreground"
+                        )}
+                      >
+                        {sz}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Divider motif */}
+              <KantriMotifDivider />
+
+              {/* Description Textarea with Mic Button */}
+              <div>
+                <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
+                  Description
+                </label>
+                <div className="relative">
+                  <textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Tell buyers what makes it special..."
+                    rows={4}
+                    className="w-full rounded-xl border border-border bg-card pl-4 pr-12 py-2.5 text-sm leading-relaxed focus:border-primary focus:outline-none"
+                  />
+                  <motion.button
+                    type="button"
+                    whileTap={{ scale: 0.9 }}
+                    onClick={toggleDescriptionRecording}
+                    className={cn(
+                      "absolute right-3 bottom-3 grid h-8 w-8 place-items-center rounded-full text-white shadow-md btn-lift",
+                      isRecordingDescription
+                        ? "bg-destructive ring-4 ring-destructive/30 animate-pulse"
+                        : "bg-primary hover:bg-primary-hover"
+                    )}
+                    aria-label={isRecordingDescription ? "Stop description recording" : "Record description speech"}
+                  >
+                    {isRecordingDescription ? (
+                      <span className="h-2.5 w-2.5 rounded-full bg-white animate-ping" />
+                    ) : (
+                      <Mic className="h-3.5 w-3.5" />
+                    )}
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <div className="px-5 pt-8">

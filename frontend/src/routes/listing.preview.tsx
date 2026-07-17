@@ -131,12 +131,12 @@ function PreviewPage() {
       const listingObj = currentListing.final_listing as any;
       setProductName(listingObj.title || "");
       setPrice(listingObj.price || 1499);
-      setMaterial(listingObj.material || extractMaterial(listingObj));
-      setColour(listingObj.colour || extractColour(listingObj));
+      setMaterial(listingObj.material || listingObj.fabric || extractMaterial(listingObj));
+      setColour(listingObj.colour || listingObj.pattern || extractColour(listingObj));
       setSleeve(listingObj.sleeve || extractSleeve(listingObj));
       setOccasion(listingObj.occasion || extractOccasion(listingObj));
       
-      const initialSizes = listingObj.sizes || (listingObj.size_chart ? Object.keys(listingObj.size_chart) : ["Free"]);
+      const initialSizes = listingObj.available_sizes || listingObj.sizes || (listingObj.size_chart ? Object.keys(listingObj.size_chart) : ["Free"]);
       setSelectedSizes(initialSizes);
       
       setDescription(listingObj.description || (listingObj.bullets ? listingObj.bullets.join("\n") : ""));

@@ -98,6 +98,13 @@ async def generate_listing_content(input_text: str, image_findings: dict, catego
         "3. 'size_chart': A JSON dictionary mapping standard sizes (S, M, L, XL, XXL, or 'Free Size') to measurement details (e.g. 'Bust: 38 in').\n"
         "4. 'price': A recommended price in INR (integer, e.g. 799).\n"
         "5. 'keywords': A JSON list of 5-8 search keywords.\n"
+        "6. 'material': The primary material of the product (e.g. 'Cotton', 'Silk', 'Brass', 'Leather').\n"
+        "7. 'fabric': Specific fabric texture details (e.g. 'Banarasi Silk', 'Khadder Cotton', 'TPR Sole') if relevant.\n"
+        "8. 'colour': Main color(s) of the product.\n"
+        "9. 'pattern': Design pattern or prints (e.g. 'Floral Print', 'Solid', 'Embroidered').\n"
+        "10. 'sleeve': Sleeve style for apparel items like kurtis/sarees (e.g. '3/4 Sleeve', 'Sleeveless'). This field must be null/None for non-apparel categories like footwear, jewelry, or home decor.\n"
+        "11. 'occasion': Ideal occasion for the product (e.g. 'Festive Wear', 'Wedding Wear', 'Daily Casual').\n"
+        "12. 'available_sizes': A JSON list of standard sizes available (e.g. ['Free'], or ['S', 'M', 'L', 'XL', 'XXL']).\n"
     )
     
     try:
@@ -150,7 +157,8 @@ def score_return_risk(listing: dict, category: str) -> dict:
         elif "color" in issue_id:
             addressed = any(w in combined for w in ["color", "shade", "screen", "variation", "image", "actual", "picture"])
         elif "fabric" in issue_id or "material" in issue_id or "silk" in issue_id or "cotton" in issue_id:
-            addressed = any(w in combined for w in ["fabric", "material", "pure", "quality", "cotton", "silk", "soft", "blend", "breathable", "drape"])
+            material_val = listing.get("material", "") or listing.get("fabric", "")
+            addressed = bool(material_val and len(str(material_val).strip()) > 0) or any(w in combined for w in ["fabric", "material", "pure", "quality", "cotton", "silk", "soft", "blend", "breathable", "drape"])
         elif "stitch" in issue_id or "seam" in issue_id or "hem" in issue_id or "finish" in issue_id:
             addressed = any(w in combined for w in ["stitch", "seam", "hem", "finish", "craft", "tailor", "durable"])
         elif "blouse" in issue_id:

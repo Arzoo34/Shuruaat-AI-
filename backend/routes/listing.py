@@ -17,7 +17,14 @@ async def run_listing_agent(
     target_language: str = Form(...),
     pincode: Optional[str] = Form(None),
     audio: Optional[UploadFile] = File(None),
-    images: Optional[List[UploadFile]] = File(None)
+    images: Optional[List[UploadFile]] = File(None),
+    product_name: Optional[str] = Form(None),
+    material: Optional[str] = Form(None),
+    colour: Optional[str] = Form(None),
+    sleeve: Optional[str] = Form(None),
+    occasion: Optional[str] = Form(None),
+    sizes: Optional[str] = Form(None),
+    description: Optional[str] = Form(None)
 ):
     """
     Exposes the Listing Agent workflow.
@@ -61,6 +68,20 @@ async def run_listing_agent(
         query_parts.append(f"Target Language: {target_language}")
         if pincode:
             query_parts.append(f"Delivery Pincode: {pincode}")
+        if product_name:
+            query_parts.append(f"Seller Entered Product Name: {product_name}")
+        if material:
+            query_parts.append(f"Seller Entered Material: {material}")
+        if colour:
+            query_parts.append(f"Seller Entered Colour: {colour}")
+        if sleeve:
+            query_parts.append(f"Seller Entered Sleeve: {sleeve}")
+        if occasion:
+            query_parts.append(f"Seller Entered Occasion: {occasion}")
+        if sizes:
+            query_parts.append(f"Seller Entered Available Sizes: {sizes}")
+        if description:
+            query_parts.append(f"Seller Entered Description: {description}")
             
         user_query = "\n".join(query_parts)
         
