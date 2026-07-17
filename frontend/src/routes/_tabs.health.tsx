@@ -49,7 +49,7 @@ function formatTrend(trend: string) {
 }
 
 function HealthPage() {
-  const { t, language } = useTranslation();
+  const { t, language, businessName } = useTranslation();
   const sellerProfile = useAppStore((s) => s.sellerProfile);
   const healthBrief = useAppStore((s) => s.healthBrief);
   const setHealthBrief = useAppStore((s) => s.setHealthBrief);
@@ -68,7 +68,7 @@ function HealthPage() {
     setSelectedLanguage(language);
 
     try {
-      const response = await getWeeklyBrief(sellerId, language);
+      const response = await getWeeklyBrief(sellerId, language, businessName);
       setHealthBrief(response);
     } catch (err: unknown) {
       const apiErr = err as { message?: string };
@@ -76,7 +76,7 @@ function HealthPage() {
     } finally {
       setLoading(false);
     }
-  }, [sellerId, language, setHealthBrief, setSelectedLanguage]);
+  }, [sellerId, language, businessName, setHealthBrief, setSelectedLanguage]);
 
   useEffect(() => {
     fetchBrief();

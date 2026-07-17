@@ -1,4 +1,5 @@
 import logging
+from typing import Optional
 from fastapi import APIRouter, HTTPException
 from models.schemas import (
     HealthBriefResponse,
@@ -13,7 +14,7 @@ router = APIRouter(prefix="/api/health-brief", tags=["health-brief"])
 logger = logging.getLogger(__name__)
 
 @router.get("/weekly-summary", response_model=HealthBriefResponse)
-async def get_weekly_summary(seller_id: str, target_language: str):
+async def get_weekly_summary(seller_id: str, target_language: str, seller_name: Optional[str] = None):
     """
     GET /api/health-brief/weekly-summary
     Fetches structured weekly report data and calls llm_client to generate a friendly localized narrative.
@@ -22,6 +23,8 @@ async def get_weekly_summary(seller_id: str, target_language: str):
     try:
         # Fetch the brief (defaults to seller_demo_1 if not found)
         brief = get_weekly_brief(seller_id)
+        if seller_name:
+            brief["seller_name"] = seller_name
         
         # Generate conversational narrative (falls back to local templates if LLM fails)
         narrative, source = await generate_narrative_summary(brief, target_language)

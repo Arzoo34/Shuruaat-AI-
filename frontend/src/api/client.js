@@ -79,14 +79,15 @@ export async function runQnaAgent(listingId, currentListing, targetLanguage) {
   });
 }
 
-export async function getWeeklyBrief(sellerId, targetLanguage) {
-  return await apiRequest(
-    `/api/health-brief/weekly-summary?seller_id=${encodeURIComponent(sellerId)}&target_language=${encodeURIComponent(targetLanguage)}`,
-    {
-      method: "GET",
-      timeout: 30000,
-    }
-  );
+export async function getWeeklyBrief(sellerId, targetLanguage, sellerName) {
+  let url = `/api/health-brief/weekly-summary?seller_id=${encodeURIComponent(sellerId)}&target_language=${encodeURIComponent(targetLanguage)}`;
+  if (sellerName) {
+    url += `&seller_name=${encodeURIComponent(sellerName)}`;
+  }
+  return await apiRequest(url, {
+    method: "GET",
+    timeout: 30000,
+  });
 }
 
 export async function applyHealthSuggestion(sellerId, action) {
