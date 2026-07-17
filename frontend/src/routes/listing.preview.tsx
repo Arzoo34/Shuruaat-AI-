@@ -268,9 +268,6 @@ function PreviewPage() {
 
       <div className="relative">
         <img src={imageSrc} alt={productName || "Product"} className="h-96 w-full object-cover object-top" width={800} height={800} loading="lazy" />
-        <div className="absolute left-3 top-3 rounded-full bg-card/90 px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-primary backdrop-blur">
-          {t("aiGenerated")}
-        </div>
       </div>
 
       {/* Interactive & Editable Attributes Grid Section */}
