@@ -27,7 +27,7 @@ def get_listing_agent_executor() -> AgentExecutor:
         raise ValueError("GROQ_API_KEY environment variable is not set")
         
     llm = ChatGroq(
-        model="llama-3.3-70b-versatile",
+        model="llama-3.1-8b-instant",
         groq_api_key=api_key,
         temperature=0.0,
         max_retries=1
