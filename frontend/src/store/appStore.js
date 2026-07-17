@@ -58,4 +58,31 @@ export const useAppStore = create((set) => ({
   /** @type {Record<string, unknown> | null} */
   healthBrief: null,
   setHealthBrief: (brief) => set({ healthBrief: brief }),
+
+  /** @type {Array<Record<string, any>>} */
+  publishedListings: [
+    {
+      id: "listing_01",
+      title: "Jaipuri Cotton Kurti",
+      price: 599,
+      category: "kurti",
+      material: "Cotton",
+      colour: "Blue",
+      sleeve: "3/4 Sleeve",
+      occasion: "Casual",
+      available_sizes: ["S", "M", "L", "XL"]
+    },
+    {
+      id: "listing_02",
+      title: "Pink Banarasi Silk Saree",
+      price: 2499,
+      category: "saree",
+      material: "Silk",
+      colour: "Pink",
+      sleeve: "Half Sleeve",
+      occasion: "Festive",
+      available_sizes: ["Free"]
+    }
+  ],
+  addPublishedListing: (listing) => set((state) => ({ publishedListings: [listing, ...state.publishedListings] })),
 }));

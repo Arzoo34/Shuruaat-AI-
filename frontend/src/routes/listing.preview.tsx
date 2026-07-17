@@ -106,6 +106,7 @@ function PreviewPage() {
   const currentListing = useAppStore((s) => s.currentListing);
   const setCurrentListing = useAppStore((s) => s.setCurrentListing);
   const resolveIssue = useAppStore((s) => s.resolveIssue);
+  const addPublishedListing = useAppStore((s) => s.addPublishedListing);
 
   useEffect(() => {
     if (!currentListing?.final_listing) {
@@ -543,7 +544,26 @@ function PreviewPage() {
         <GhostButton onClick={handleEditClick} className="flex-1">
           <Pencil className="h-4 w-4" /> {t("editListing")}
         </GhostButton>
-        <PrimaryButton onClick={() => setPublished(true)} className="flex-1">
+        <PrimaryButton
+          onClick={() => {
+            if (currentListing) {
+              addPublishedListing({
+                id: Date.now().toString(),
+                title: productName,
+                price: price,
+                category: currentListing.declared_category || "kurti",
+                material: material,
+                colour: colour,
+                sleeve: sleeve,
+                occasion: occasion,
+                available_sizes: selectedSizes,
+                description: description,
+              });
+            }
+            setPublished(true);
+          }}
+          className="flex-1"
+        >
           <Send className="h-5 w-5" /> {t("publishStore").replace("to Store", "")}
         </PrimaryButton>
       </div>
