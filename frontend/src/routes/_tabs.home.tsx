@@ -21,8 +21,33 @@ export const Route = createFileRoute("/_tabs/home")({
   component: HomePage,
 });
 
+function getGreeting(language: string, name: string): string {
+  const hr = new Date().getHours();
+  const sellerName = name || "Priya";
+  
+  if (language === "hi") {
+    if (hr >= 5 && hr < 12) return `शुभ प्रभात, ${sellerName} 👋`;
+    if (hr >= 12 && hr < 17) return `शुभ दोपहर, ${sellerName} 👋`;
+    return `शुभ संध्या, ${sellerName} 👋`;
+  }
+  if (language === "ta") {
+    if (hr >= 5 && hr < 12) return `காலை வணக்கம், ${sellerName} 👋`;
+    if (hr >= 12 && hr < 17) return `மதிய வணக்கம், ${sellerName} 👋`;
+    return `மாலை வணக்கம், ${sellerName} 👋`;
+  }
+  if (language === "bn") {
+    if (hr >= 5 && hr < 12) return `সুপ্রভাত, ${sellerName} 👋`;
+    if (hr >= 12 && hr < 17) return `শুভ দুপুর, ${sellerName} 👋`;
+    return `শুভ সন্ধ্যা, ${sellerName} 👋`;
+  }
+  
+  if (hr >= 5 && hr < 12) return `Good Morning, ${sellerName} 👋`;
+  if (hr >= 12 && hr < 17) return `Good Afternoon, ${sellerName} 👋`;
+  return `Good Evening, ${sellerName} 👋`;
+}
+
 function HomePage() {
-  const { t, businessName } = useTranslation();
+  const { t, businessName, language } = useTranslation();
 
   const agents = [
     { to: "/listing", label: t("listingAgent"), desc: t("listingAgentDesc"), Icon: Package, tint: "from-[oklch(0.94_0.06_75)] to-[oklch(0.98_0.03_80)]" },
@@ -36,10 +61,13 @@ function HomePage() {
     { emoji: "💄", title: t("oil"), note: t("trends3") },
   ];
 
+  const greeting = getGreeting(language, businessName);
+  const initial = (businessName || "Priya").trim().charAt(0).toUpperCase();
+
   return (
     <div>
       <PageHeader
-        title={t("goodMorning").replace("Priya", businessName || "Priya").replace("प्रिया", businessName || "प्रिया").replace("பிரியா", businessName || "பிரியா").replace("প্রিয়া", businessName || "প্রিয়া")}
+        title={greeting}
         subtitle={t("homeSubtitle")}
         right={
           <div className="flex items-center gap-2">
@@ -47,7 +75,7 @@ function HomePage() {
               <Bell className="h-5 w-5 text-foreground/70" />
             </button>
             <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-primary to-accent font-display font-bold text-primary-foreground">
-              P
+              {initial}
             </div>
           </div>
         }

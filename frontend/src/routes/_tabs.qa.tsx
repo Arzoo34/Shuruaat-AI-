@@ -38,6 +38,7 @@ function QAPage() {
   const currentListing = useAppStore((s) => s.currentListing);
   const qnaData = useAppStore((s) => s.qnaData);
   const setQnaData = useAppStore((s) => s.setQnaData);
+  const selectedLanguage = useAppStore((s) => s.selectedLanguage);
   const setSelectedLanguage = useAppStore((s) => s.setSelectedLanguage);
 
   const [loading, setLoading] = useState(true);
@@ -67,9 +68,13 @@ function QAPage() {
   }, [currentListing, language, setQnaData, setSelectedLanguage]);
 
   useEffect(() => {
-    fetchQna();
+    if (!qnaData || selectedLanguage !== language) {
+      fetchQna();
+    } else {
+      setLoading(false);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [language]);
+  }, [language, qnaData, selectedLanguage]);
 
   const individualReplies = (qnaData?.individual_replies ?? []) as IndividualReply[];
   const patternFlags = (qnaData?.pattern_flags ?? []) as PatternFlag[];
