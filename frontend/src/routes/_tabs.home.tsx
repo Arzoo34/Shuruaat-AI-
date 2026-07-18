@@ -101,7 +101,9 @@ function HomePage() {
             <div className="min-w-0">
               <p className="text-[11px] font-semibold uppercase tracking-widest text-secondary">{t("healthAgent")}</p>
               <div className="flex items-baseline gap-2">
-                <span className="font-display text-4xl font-extrabold text-foreground">92</span>
+                <span className="font-display text-4xl font-extrabold text-foreground">
+                  {simulationUnlocked ? "92" : "--"}
+                </span>
                 <span className="text-sm font-semibold text-[oklch(0.55_0.14_145)]">{t("scoreTitle").split(" — ")[0]}</span>
               </div>
               <p className="mt-1 text-xs text-muted-foreground">{t("scoreDesc")}</p>
@@ -111,7 +113,7 @@ function HomePage() {
             <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
               <motion.div
                 initial={{ width: 0 }}
-                animate={{ width: "92%" }}
+                animate={{ width: simulationUnlocked ? "92%" : "0%" }}
                 transition={{ duration: 1.1, ease: "easeOut" }}
                 className="h-full rounded-full bg-gradient-to-r from-[oklch(0.7_0.16_140)] to-[oklch(0.82_0.16_85)]"
               />

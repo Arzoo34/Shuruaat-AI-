@@ -35,6 +35,8 @@ function ListingPage() {
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [isRecording, setIsRecording] = useState(false);
+  const [liveTranscript, setLiveTranscript] = useState("");
+  const mainRecognitionRef = useRef<any>(null);
 
   const [productName, setProductName] = useState("");
   const [material, setMaterial] = useState("");
@@ -121,6 +123,11 @@ function ListingPage() {
   async function toggleRecording() {
     if (isRecording && mediaRecorderRef.current) {
       mediaRecorderRef.current.stop();
+      if (mainRecognitionRef.current) {
+        try {
+          mainRecognitionRef.current.stop();
+        } catch (e) {}
+      }
       setIsRecording(false);
       return;
     }
@@ -140,8 +147,35 @@ function ListingPage() {
       recorder.start();
       mediaRecorderRef.current = recorder;
       setIsRecording(true);
-    } catch {
-      setError("Microphone access denied — you can still upload a photo and generate.");
+      setLiveTranscript("");
+
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        const recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = language === "hi" ? "hi-IN" : "en-IN";
+        
+        recognition.onresult = (event: any) => {
+          let transcript = "";
+          for (let i = 0; i < event.results.length; i++) {
+            transcript += event.results[i][0].transcript;
+          }
+          setLiveTranscript(transcript);
+        };
+        
+        recognition.onerror = (e: any) => {
+          console.error("Speech recognition error:", e.error);
+          // We intentionally don't update the UI here. If it fails, it will silently 
+          // fall back to showing the pulsing "Listening..." state.
+        };
+        
+        recognition.start();
+        mainRecognitionRef.current = recognition;
+      }
+    } catch (err: any) {
+      console.error("MediaRecorder error:", err);
+      setError("Microphone access denied or unavailable.");
     }
   }
 
@@ -277,13 +311,21 @@ function ListingPage() {
                 {isRecording && <span className="absolute inset-0 rounded-full bg-primary/30 animate-ping" />}
                 <Mic className="relative h-10 w-10" strokeWidth={2.2} />
               </motion.button>
-              <p className="mt-4 text-sm text-muted-foreground">
-                {isRecording
-                  ? "Recording… tap again to stop"
-                  : audioBlob
-                    ? "✓ Voice recorded — tap to re-record"
-                    : "Tap to record in your language"}
-              </p>
+              <div className="mt-4 min-h-[40px] px-2">
+                {isRecording ? (
+                  <p className="text-sm font-medium text-foreground">
+                    {liveTranscript ? `"${liveTranscript}"` : (
+                      <span className="text-muted-foreground animate-pulse">Listening...</span>
+                    )}
+                  </p>
+                ) : audioBlob ? (
+                  <p className="text-sm font-medium text-foreground">
+                    {liveTranscript ? `"${liveTranscript}"` : "✓ Voice recorded — tap to re-record"}
+                  </p>
+                ) : (
+                  <p className="text-sm text-muted-foreground">Tap to record in your language</p>
+                )}
+              </div>
             </Card>
           </div>
 
@@ -497,7 +539,7 @@ function ListingPage() {
               {/* Divider motif */}
               <KantriMotifDivider />
 
-              {/* Description Textarea with Mic Button */}
+              {/* Description Textarea */}
               <div>
                 <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
                   Description
@@ -508,26 +550,8 @@ function ListingPage() {
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Tell buyers what makes it special..."
                     rows={4}
-                    className="w-full rounded-xl border border-border bg-card pl-4 pr-12 py-2.5 text-sm leading-relaxed focus:border-primary focus:outline-none"
+                    className="w-full rounded-xl border border-border bg-card px-4 py-2.5 text-sm leading-relaxed focus:border-primary focus:outline-none"
                   />
-                  <motion.button
-                    type="button"
-                    whileTap={{ scale: 0.9 }}
-                    onClick={toggleDescriptionRecording}
-                    className={cn(
-                      "absolute right-3 bottom-3 grid h-8 w-8 place-items-center rounded-full text-white shadow-md btn-lift",
-                      isRecordingDescription
-                        ? "bg-destructive ring-4 ring-destructive/30 animate-pulse"
-                        : "bg-primary hover:bg-primary-hover"
-                    )}
-                    aria-label={isRecordingDescription ? "Stop description recording" : "Record description speech"}
-                  >
-                    {isRecordingDescription ? (
-                      <span className="h-2.5 w-2.5 rounded-full bg-white animate-ping" />
-                    ) : (
-                      <Mic className="h-3.5 w-3.5" />
-                    )}
-                  </motion.button>
                 </div>
               </div>
             </motion.div>
