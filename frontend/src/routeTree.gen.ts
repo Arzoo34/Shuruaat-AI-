@@ -9,20 +9,24 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as PublishSuccessRouteImport } from './routes/publish-success'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as TabsRouteImport } from './routes/_tabs'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ListingPreviewRouteImport } from './routes/listing.preview'
-import { Route as TabsQaRouteImport } from './routes/_tabs.qa'
-import { Route as TabsProfileRouteImport } from './routes/_tabs.profile'
-import { Route as TabsListingRouteImport } from './routes/_tabs.listing'
-import { Route as TabsHomeRouteImport } from './routes/_tabs.home'
+import { Route as TabsRouteImport } from './routes/_tabs'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as PublishSuccessRouteImport } from './routes/publish-success'
 import { Route as TabsHealthRouteImport } from './routes/_tabs.health'
+import { Route as TabsHomeRouteImport } from './routes/_tabs.home'
+import { Route as TabsListingRouteImport } from './routes/_tabs.listing'
+import { Route as TabsProfileRouteImport } from './routes/_tabs.profile'
+import { Route as TabsQaRouteImport } from './routes/_tabs.qa'
+import { Route as ListingPreviewRouteImport } from './routes/listing.preview'
 
-const PublishSuccessRoute = PublishSuccessRouteImport.update({
-  id: '/publish-success',
-  path: '/publish-success',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TabsRoute = TabsRouteImport.update({
+  id: '/_tabs',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -30,33 +34,14 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TabsRoute = TabsRouteImport.update({
-  id: '/_tabs',
+const PublishSuccessRoute = PublishSuccessRouteImport.update({
+  id: '/publish-success',
+  path: '/publish-success',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ListingPreviewRoute = ListingPreviewRouteImport.update({
-  id: '/listing/preview',
-  path: '/listing/preview',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TabsQaRoute = TabsQaRouteImport.update({
-  id: '/qa',
-  path: '/qa',
-  getParentRoute: () => TabsRoute,
-} as any)
-const TabsProfileRoute = TabsProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => TabsRoute,
-} as any)
-const TabsListingRoute = TabsListingRouteImport.update({
-  id: '/listing',
-  path: '/listing',
+const TabsHealthRoute = TabsHealthRouteImport.update({
+  id: '/health',
+  path: '/health',
   getParentRoute: () => TabsRoute,
 } as any)
 const TabsHomeRoute = TabsHomeRouteImport.update({
@@ -64,10 +49,25 @@ const TabsHomeRoute = TabsHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => TabsRoute,
 } as any)
-const TabsHealthRoute = TabsHealthRouteImport.update({
-  id: '/health',
-  path: '/health',
+const TabsListingRoute = TabsListingRouteImport.update({
+  id: '/listing',
+  path: '/listing',
   getParentRoute: () => TabsRoute,
+} as any)
+const TabsProfileRoute = TabsProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => TabsRoute,
+} as any)
+const TabsQaRoute = TabsQaRouteImport.update({
+  id: '/qa',
+  path: '/qa',
+  getParentRoute: () => TabsRoute,
+} as any)
+const ListingPreviewRoute = ListingPreviewRouteImport.update({
+  id: '/listing/preview',
+  path: '/listing/preview',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -152,18 +152,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/publish-success': {
-      id: '/publish-success'
-      path: '/publish-success'
-      fullPath: '/publish-success'
-      preLoaderRoute: typeof PublishSuccessRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_tabs': {
@@ -173,39 +166,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TabsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/listing/preview': {
-      id: '/listing/preview'
-      path: '/listing/preview'
-      fullPath: '/listing/preview'
-      preLoaderRoute: typeof ListingPreviewRouteImport
+    '/publish-success': {
+      id: '/publish-success'
+      path: '/publish-success'
+      fullPath: '/publish-success'
+      preLoaderRoute: typeof PublishSuccessRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_tabs/qa': {
-      id: '/_tabs/qa'
-      path: '/qa'
-      fullPath: '/qa'
-      preLoaderRoute: typeof TabsQaRouteImport
-      parentRoute: typeof TabsRoute
-    }
-    '/_tabs/profile': {
-      id: '/_tabs/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof TabsProfileRouteImport
-      parentRoute: typeof TabsRoute
-    }
-    '/_tabs/listing': {
-      id: '/_tabs/listing'
-      path: '/listing'
-      fullPath: '/listing'
-      preLoaderRoute: typeof TabsListingRouteImport
+    '/_tabs/health': {
+      id: '/_tabs/health'
+      path: '/health'
+      fullPath: '/health'
+      preLoaderRoute: typeof TabsHealthRouteImport
       parentRoute: typeof TabsRoute
     }
     '/_tabs/home': {
@@ -215,12 +194,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TabsHomeRouteImport
       parentRoute: typeof TabsRoute
     }
-    '/_tabs/health': {
-      id: '/_tabs/health'
-      path: '/health'
-      fullPath: '/health'
-      preLoaderRoute: typeof TabsHealthRouteImport
+    '/_tabs/listing': {
+      id: '/_tabs/listing'
+      path: '/listing'
+      fullPath: '/listing'
+      preLoaderRoute: typeof TabsListingRouteImport
       parentRoute: typeof TabsRoute
+    }
+    '/_tabs/profile': {
+      id: '/_tabs/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof TabsProfileRouteImport
+      parentRoute: typeof TabsRoute
+    }
+    '/_tabs/qa': {
+      id: '/_tabs/qa'
+      path: '/qa'
+      fullPath: '/qa'
+      preLoaderRoute: typeof TabsQaRouteImport
+      parentRoute: typeof TabsRoute
+    }
+    '/listing/preview': {
+      id: '/listing/preview'
+      path: '/listing/preview'
+      fullPath: '/listing/preview'
+      preLoaderRoute: typeof ListingPreviewRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
