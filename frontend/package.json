@@ -37,7 +37,6 @@
     "@supabase/supabase-js": "^2.110.7",
     "@tanstack/react-query": "5.56.2",
     "@tanstack/react-router": "1.58.2",
-    "@tanstack/react-start": "1.58.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
@@ -60,9 +59,9 @@
     "@types/node": "^22.5.4",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
-    "@vitejs/plugin-react": "^5.0.1",
+    "@vitejs/plugin-react": "^6.0.3",
     "typescript": "^5.5.4",
-    "vite": "6.0.7",
-    "vite-tsconfig-paths": "^5.1.4"
+    "vite": "^8.1.5",
+    "vite-tsconfig-paths": "^6.1.1"
   }
 }
