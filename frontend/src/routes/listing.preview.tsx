@@ -276,12 +276,7 @@ function PreviewPage() {
         <div className="w-10" />
       </div>
 
-      {currentListing.fallback_used && (
-        <div className="mx-5 mt-3 flex items-center gap-2 rounded-xl bg-muted/60 px-3 py-2 text-xs text-muted-foreground">
-          <Info className="h-3.5 w-3.5 shrink-0" />
-          Generated from fallback catalog — agent was unavailable
-        </div>
-      )}
+
 
       <div className="relative">
         <img src={imageSrc} alt={productName || "Product"} className="h-96 w-full object-cover object-top" width={800} height={800} loading="lazy" />
